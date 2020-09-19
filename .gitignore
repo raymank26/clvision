@@ -1,0 +1,12 @@
+/build/
+/client/build/
+/server/build/
+/sdk/build/
+/dashboard/build/
+/dashboard/dist/
+/.idea
+*.swp*
+/.gradle
+/out
+node_modules/
+local.properties
