@@ -13,7 +13,7 @@ class ClickhouseDao(
 
 ) {
 
-    private val plainAggregationService = PlainAggregationService(jdbi, tableRegistry)
+    private val aggregationService = AggregationService(jdbi, tableRegistry)
 
     fun insertMetrics(rawMetrics: List<Metric>) {
         for ((tableId, metrics: List<Metric>) in rawMetrics.groupBy { it.tableId }) {
@@ -52,10 +52,7 @@ class ClickhouseDao(
     }
 
     fun aggregateMetrics(period: AggregationPeriod, query: Query): List<AggregatedMetric> {
-        return when (query) {
-            is Query.GroupedBy -> TODO()
-            is Query.Plain -> plainAggregationService.aggregateMetrics(period, query)
-        }
+        return aggregationService.aggregateMetrics(period, query)
     }
 
     fun executeQuery(query: String) {

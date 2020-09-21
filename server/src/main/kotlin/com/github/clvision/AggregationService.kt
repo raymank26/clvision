@@ -4,9 +4,9 @@ import org.jdbi.v3.core.Jdbi
 import org.slf4j.LoggerFactory
 import java.time.format.DateTimeFormatter
 
-private val LOG = LoggerFactory.getLogger(PlainAggregationService::class.java)
+private val LOG = LoggerFactory.getLogger(AggregationService::class.java)
 
-class PlainAggregationService(
+class AggregationService(
         private val jdbi: Jdbi,
         private val tableRegistry: TableRegistry,
 ) {
@@ -17,31 +17,32 @@ class PlainAggregationService(
             LOG.warn("Unable to find tableInfo by id = " + query.tableId)
             return emptyList()
         }
-        return when (query) {
-            is Query.GroupedBy -> TODO()
-            is Query.Plain ->
-                jdbi.withHandle<List<AggregatedMetric>, java.lang.Exception> { handle ->
-                    val whereClause = buildWhere(query.filter, tableInfo)
-                    val aggFunction = buildAgg(query.filter)
-                    val groupByClause = buildGroupBy(period)
-                    val selectClause = buildSelectClause(period)
-                    val querySt = handle.createQuery("""
+        return jdbi.withHandle<List<AggregatedMetric>, java.lang.Exception> { handle ->
+            val whereClause = buildWhere(query.filter, tableInfo)
+            val aggFunction = buildAgg(query.filter)
+            val groupByClause = buildGroupBy(period, query)
+            val selectClause = buildSelectClause(period, query)
+            val querySt = handle.createQuery("""
                         |SELECT $selectClause, $aggFunction as value FROM ${tableInfo.name}
                         | WHERE $whereClause
                         | GROUP BY $groupByClause
                         |""".trimMargin())
-                    for (match in query.filter.matches) {
-                        querySt.bind(match.key, match.value)
-                    }
-                    querySt.bindList("dates", period.days.map { it.format(DateTimeFormatter.ISO_DATE) })
-                    LOG.debug("Query = {}", query)
-                    query.toString()
-                    querySt.map { rs, _ ->
-                        val time = rs.getString("time")
-                        val value = rs.getDouble("value")
-                        AggregatedMetric("value", time, value)
-                    }.list()
+            for (match in query.filter.matches) {
+                querySt.bind(match.key, match.value)
+            }
+            querySt.bindList("dates", period.days.map { it.format(DateTimeFormatter.ISO_DATE) })
+            LOG.debug("Query = {}", query)
+            query.toString()
+            querySt.map { rs, _ ->
+                val time = rs.getString("time")
+                val value = rs.getDouble("value")
+                val name = if (query.groupByField != null) {
+                    rs.getString(query.groupByField)
+                } else {
+                    "value"
                 }
+                AggregatedMetric(name, time, value)
+            }.list()
         }
     }
 
@@ -60,19 +61,29 @@ class PlainAggregationService(
         return filters.joinToString(" AND ")
     }
 
-    private fun buildGroupBy(period: AggregationPeriod): Any {
-        return if (period.groupByDay) {
+    private fun buildGroupBy(period: AggregationPeriod, query: Query): Any {
+        val time = if (period.groupByDay) {
             "date"
         } else {
             "timeMinute"
         }
+        return if (query.groupByField != null) {
+            time + ", " + query.groupByField
+        } else {
+            time
+        }
     }
 
-    private fun buildSelectClause(period: AggregationPeriod): Any {
-        return if (period.groupByDay) {
+    private fun buildSelectClause(period: AggregationPeriod, query: Query): Any {
+        val time = if (period.groupByDay) {
             "date as time"
         } else {
             "timeMinute as time"
+        }
+        return if (query.groupByField != null) {
+            time + "," + query.groupByField
+        } else {
+            time
         }
     }
 

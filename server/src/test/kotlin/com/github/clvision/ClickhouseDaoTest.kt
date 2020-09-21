@@ -62,7 +62,7 @@ class ClickhouseDaoTest {
     fun testSingleRowQuery() {
         val queriedMetrics = clickhouseDao.aggregateMetrics(
                 QUERY_PERIOD,
-                Query.Plain(Filter(mapOf("colFoo" to "%fi%"),
+                Query(null, Filter(mapOf("colFoo" to "%fi%"),
                         MetricType.SUCCESS, false),
                         TABLE_ID
                 )
@@ -78,7 +78,7 @@ class ClickhouseDaoTest {
     fun testTwoRowsQuery() {
         val queriedMetrics = clickhouseDao.aggregateMetrics(
                 QUERY_PERIOD,
-                Query.Plain(Filter(emptyMap(),
+                Query(null, Filter(emptyMap(),
                         MetricType.SUCCESS, false),
                         TABLE_ID
                 )
@@ -94,7 +94,7 @@ class ClickhouseDaoTest {
     fun testAggregationByDays() {
         val queriedMetrics = clickhouseDao.aggregateMetrics(
                 QUERY_PERIOD.copy(groupByDay = true),
-                Query.Plain(Filter(emptyMap(),
+                Query(null, Filter(emptyMap(),
                         MetricType.SUCCESS, false),
                         TABLE_ID
                 )
@@ -105,9 +105,18 @@ class ClickhouseDaoTest {
         aggMetric.time shouldBeEqualTo "2020-09-21"
         aggMetric.value shouldBeAlmostEqualTo 2.0
     }
+
+    @Test
+    fun testAggregationWithGroupBy() {
+        val metrics = clickhouseDao.aggregateMetrics(QUERY_PERIOD,
+                Query("colFoo", Filter(emptyMap(),
+                        MetricType.SUCCESS, false),
+                        TABLE_ID
+                ))
+        // TODO: write asserts
+    }
 }
 
 infix fun Double.shouldBeAlmostEqualTo(other: Double) {
     Assert.assertTrue("Current value = '$this' doesn't equal to expected '$other'", abs(this - other) < other)
-
 }
