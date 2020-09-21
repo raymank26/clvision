@@ -13,12 +13,22 @@ class AggregationService(
 
     fun aggregateMetrics(period: AggregationPeriod, query: Query): List<AggregatedMetric> {
         val tableInfo = tableRegistry.getNameById(query.tableId)
-        if (tableInfo == null) {
-            LOG.warn("Unable to find tableInfo by id = " + query.tableId)
-            return emptyList()
+                ?: error("Unable to find tableInfo by id = " + query.tableId)
+        val columnNames: Set<String> = query.filter.matches.keys.let { set ->
+            if (query.groupByField != null) {
+                set + query.groupByField
+            } else {
+                set
+            }
+        }
+        val availableColumnNames = tableInfo.colums.map { it.name }
+        for (name in columnNames) {
+            if (!availableColumnNames.contains(name)) {
+                error("Unable to find columnName = '$name'")
+            }
         }
         return jdbi.withHandle<List<AggregatedMetric>, java.lang.Exception> { handle ->
-            val whereClause = buildWhere(query.filter, tableInfo)
+            val whereClause = buildWhere(query.filter)
             val aggFunction = buildAgg(query.filter)
             val groupByClause = buildGroupBy(period, query)
             val selectClause = buildSelectClause(period, query)
@@ -46,13 +56,9 @@ class AggregationService(
         }
     }
 
-    private fun buildWhere(filter: Filter, tableInfo: TableInfo): String {
+    private fun buildWhere(filter: Filter): String {
         val filters = mutableListOf<String>()
-        val availableColumns = tableInfo.colums.map { it.name }.toSet()
         for (match in filter.matches) {
-            if (!availableColumns.contains(match.key)) {
-                error("Column = " + match.key + " is not found")
-            }
             val field = match.key
             filters.add("$field LIKE :$field")
         }

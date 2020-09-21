@@ -34,7 +34,10 @@ class ClickhouseDaoTest {
     @Before
     fun before() {
         jdbi = JdbiProvider().provide(ch.jdbcUrl)
-        clickhouseDao = ClickhouseDao(jdbi) { _ -> TableInfo("Test", listOf("colFoo", "colBar").map { Column(it) }) }
+        clickhouseDao = ClickhouseDao(jdbi) { _ -> TableInfo(
+                "Test",
+                setOf("colFoo", "colBar").mapTo(mutableSetOf(), { Column(it) }) as Set<Column>
+        )}
 
         jdbi.useHandle<Exception> {
             it.execute("""CREATE TABLE Test(
