@@ -36,7 +36,7 @@ class ClickhouseDaoTest {
         jdbi = JdbiProvider().provide(ch.jdbcUrl)
         clickhouseDao = ClickhouseDao(jdbi) { _ -> TableInfo(
                 "Test",
-                setOf("colFoo", "colBar").mapTo(mutableSetOf(), { Column(it) }) as Set<Column>
+                setOf("source", "sourceGroup", "colFoo", "colBar").mapTo(mutableSetOf(), { Column(it) }) as Set<Column>
         )}
 
         jdbi.useHandle<Exception> {
@@ -57,7 +57,7 @@ class ClickhouseDaoTest {
 
         clickhouseDao.insertMetrics(listOf(
                 baseMetric,
-                baseMetric.copy(parameters = listOf("third", "fourth"), timestamp = baseMetric.timestamp + 1)
+                baseMetric.copy(source = "srv2", parameters = listOf("third", "fourth"), timestamp = baseMetric.timestamp + 1)
         ))
     }
 
@@ -117,6 +117,15 @@ class ClickhouseDaoTest {
                         TABLE_ID
                 ))
         // TODO: write asserts
+    }
+
+    @Test
+    fun testGroupBySource() {
+        val metrics = clickhouseDao.aggregateMetrics(QUERY_PERIOD,
+                Query("source", Filter(emptyMap(), MetricType.SUCCESS, false), TABLE_ID))
+        metrics.size shouldBeEqualTo 2
+        metrics[0].name shouldBeEqualTo "srv1"
+        metrics[1].name shouldBeEqualTo "srv2"
     }
 }
 

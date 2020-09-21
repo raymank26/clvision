@@ -6,6 +6,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 private val LOG = LoggerFactory.getLogger(ClickhouseDao::class.java)
+private val SPECIAL_COLUMNS = setOf("source", "sourceGroup", "type", "duration", "timeMinute")
 
 class ClickhouseDao(
         private val jdbi: Jdbi,
@@ -23,7 +24,7 @@ class ClickhouseDao(
                 return
             }
             val tableName = table.name
-            val availableColumnNames = table.colums.map { it.name }
+            val availableColumnNames = table.columns.map { it.name }.filter { !SPECIAL_COLUMNS.contains(it) }
             val joinedColumnNames = availableColumnNames.joinToString(", ")
             val joinedColumnPlaceholders = availableColumnNames.joinToString(", ") { ":$it" }
 

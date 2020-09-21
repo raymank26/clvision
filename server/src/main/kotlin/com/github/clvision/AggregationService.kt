@@ -21,7 +21,7 @@ class AggregationService(
                 set
             }
         }
-        val availableColumnNames = tableInfo.colums.map { it.name }
+        val availableColumnNames = tableInfo.columns.map { it.name }
         for (name in columnNames) {
             if (!availableColumnNames.contains(name)) {
                 error("Unable to find columnName = '$name'")
