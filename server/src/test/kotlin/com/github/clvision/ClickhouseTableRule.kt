@@ -17,7 +17,7 @@ const val TIMESTAMP = 1600648443732L
 
 val QUERY_PERIOD = AggregationPeriod(
         groupByDay = false,
-        days = listOf(LocalDate.ofInstant(Instant.ofEpochMilli(TIMESTAMP), ZoneId.systemDefault()))
+        dates = listOf(LocalDate.ofInstant(Instant.ofEpochMilli(TIMESTAMP), ZoneId.systemDefault()))
 )
 
 class ClickHouseTableRule : TestRule {
@@ -51,7 +51,7 @@ private class JdbiClickhouseRule(private val ch: ClickHouseContainer): ExternalR
         jdbi = JdbiProvider().provide(ch.jdbcUrl)
         clickhouseDao = ClickhouseDao(jdbi) { _ -> TableInfo(
                 "Test",
-                setOf("source", "sourceGroup", "colFoo", "colBar").mapTo(mutableSetOf(), { Column(it) }) as Set<Column>
+                setOf("source", "sourceGroup", "type", "duration", "colFoo", "colBar").mapTo(mutableSetOf(), { Column(it) }) as Set<Column>
         )}
 
         jdbi.useHandle<Exception> {

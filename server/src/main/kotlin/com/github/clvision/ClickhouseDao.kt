@@ -41,7 +41,11 @@ class ClickhouseDao(
                                     preparedBatch.bind(columnName, column.value.value)
                                 is MetricString ->
                                     preparedBatch.bind(columnName, column.value.value)
-                            }
+                                is MetricByte ->
+                                    preparedBatch.bind(columnName, column.value.value)
+                                is MetricLong ->
+                                    preparedBatch.bind(columnName, column.value.value)
+                            }.exhaustive
                         }
                     }
                     for (parameter in metric.parameters) {

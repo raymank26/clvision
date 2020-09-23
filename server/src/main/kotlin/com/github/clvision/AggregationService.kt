@@ -35,11 +35,12 @@ class AggregationService(
                         |SELECT $selectClause, $aggFunction as value FROM ${tableInfo.name}
                         | WHERE $whereClause
                         | GROUP BY $groupByClause
+                        | ORDER BY time
                         |""".trimMargin())
             for (match in query.filter.matches) {
                 querySt.bind(match.key, match.value)
             }
-            querySt.bindList("dates", period.days.map { it.format(DateTimeFormatter.ISO_DATE) })
+            querySt.bindList("dates", period.dates.map { it.format(DateTimeFormatter.ISO_DATE) })
             LOG.debug("Query = {}", query)
             query.toString()
             querySt.map { rs, _ ->
