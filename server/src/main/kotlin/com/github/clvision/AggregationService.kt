@@ -15,21 +15,20 @@ class AggregationService(
         val tableInfo = tableRegistry.getNameById(query.tableId)
                 ?: error("Unable to find tableInfo by id = " + query.tableId)
         val columnNames: Set<String> = query.filter.matches.keys.let { set ->
-            if (query.groupByField != null) {
-                set + query.groupByField
+            if (query.groupBy != null) {
+                set + query.groupBy.field
             } else {
                 set
             }
         }
-        val availableColumnNames = tableInfo.columns.map { it.name }
         for (name in columnNames) {
-            if (!availableColumnNames.contains(name)) {
-                error("Unable to find columnName = '$name'")
+            if (!tableInfo.allowedColumns.contains(name)) {
+                throw FieldNotFoundException("Unable to find field = $name")
             }
         }
         return jdbi.withHandle<List<AggregatedMetric>, java.lang.Exception> { handle ->
             val whereClause = buildWhere(query.filter)
-            val aggFunction = buildAgg(query.filter)
+            val aggFunction = buildAgg(query.groupBy)
             val groupByClause = buildGroupBy(period, query)
             val selectClause = buildSelectClause(period, query)
             val querySt = handle.createQuery("""
@@ -46,11 +45,7 @@ class AggregationService(
             querySt.map { rs, _ ->
                 val time = rs.getString("time")
                 val value = rs.getDouble("value")
-                val name = if (query.groupByField != null) {
-                    rs.getString(query.groupByField)
-                } else {
-                    "value"
-                }
+                val name = if (query.groupBy != null) rs.getString(query.groupBy.field) else "value"
                 AggregatedMetric(name, time, value)
             }.list()
         }
@@ -62,7 +57,6 @@ class AggregationService(
             val field = match.key
             filters.add("$field LIKE :$field")
         }
-        filters.add("type = ${filter.type.id}")
         filters.add("date in (<dates>)")
         return filters.joinToString(" AND ")
     }
@@ -73,8 +67,8 @@ class AggregationService(
         } else {
             "timeMinute"
         }
-        return if (query.groupByField != null) {
-            time + ", " + query.groupByField
+        return if (query.groupBy != null) {
+            time + ", " + query.groupBy.field
         } else {
             time
         }
@@ -86,16 +80,16 @@ class AggregationService(
         } else {
             "timeMinute as time"
         }
-        return if (query.groupByField != null) {
-            time + "," + query.groupByField
+        return if (query.groupBy != null) {
+            time + "," + query.groupBy.field
         } else {
             time
         }
     }
 
-    private fun buildAgg(filter: Filter): String {
-        return if (filter.showDuration) {
-            "sum(duration)"
+    private fun buildAgg(groupBy: GroupBy?): String {
+        return if (groupBy != null) {
+            "${groupBy.function}(${groupBy.field})"
         } else {
             "count(*)"
         }

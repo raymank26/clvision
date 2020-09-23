@@ -17,28 +17,37 @@ class ClickhouseDao(
 
     fun insertMetrics(rawMetrics: List<Metric>) {
         for ((tableId, metrics: List<Metric>) in rawMetrics.groupBy { it.tableId }) {
-            val table = tableRegistry.getNameById(tableId)
-            if (table == null) {
-                LOG.warn("No table found for id = $tableId")
-                return
-            }
+            val table = tableRegistry.getNameById(tableId) ?: error("No table found for id = $tableId")
+
             val tableName = table.name
-            val availableColumnNames = table.userDefinedColumnNames
+            val availableColumnNames = table.allowedColumns
             val joinedColumnNames = availableColumnNames.joinToString(", ")
             val joinedColumnPlaceholders = availableColumnNames.joinToString(", ") { ":$it" }
 
             jdbi.useHandle<Exception> { handle ->
-                val preparedBatch = handle.prepareBatch("INSERT INTO $tableName(source, sourceGroup, type, duration, timeMinute, $joinedColumnNames)" +
-                        " VALUES (:source, :sourceGroup, :type, :duration, :timeMinute, $joinedColumnPlaceholders)")
+                val preparedBatch = handle.prepareBatch("INSERT INTO $tableName(timeMinute, $joinedColumnNames)" +
+                        " VALUES (:timeMinute, $joinedColumnPlaceholders)")
                 for (metric in metrics) {
                     preparedBatch
-                            .bind("source", metric.source)
-                            .bind("sourceGroup", metric.sourceGroup)
-                            .bind("type", metric.type.id)
-                            .bind("duration", metric.duration)
                             .bind("timeMinute", Instant.ofEpochMilli(metric.timestamp).truncatedTo(ChronoUnit.MINUTES))
-                    for ((index, columnName) in availableColumnNames.withIndex()) {
-                        preparedBatch.bind(columnName, metric.parameters.getOrNull(index))
+                    val nameToValue: Map<String, MetricColumn> = metric.parameters.associateBy { it.name }
+                    for (columnName in availableColumnNames) {
+                        val column: MetricColumn? = nameToValue[columnName]
+                        if (column == null) {
+                            preparedBatch.bind(columnName, "null")
+                        } else {
+                            when (column.value) {
+                                is MetricDouble ->
+                                    preparedBatch.bind(columnName, column.value.value)
+                                is MetricString ->
+                                    preparedBatch.bind(columnName, column.value.value)
+                            }
+                        }
+                    }
+                    for (parameter in metric.parameters) {
+                        if (!table.allowedColumns.contains(parameter.name)) {
+                            throw FieldNotFoundException("No field found name = ${parameter.name}")
+                        }
                     }
                     preparedBatch.add()
                 }
