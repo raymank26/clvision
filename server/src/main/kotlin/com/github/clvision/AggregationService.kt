@@ -22,7 +22,7 @@ class AggregationService(
             }
         }
         for (name in columnNames) {
-            if (!tableInfo.allowedColumns.contains(name)) {
+            if (!tableInfo.allowedColumnNames.contains(name)) {
                 throw FieldNotFoundException("Unable to find field = $name")
             }
         }
@@ -40,7 +40,11 @@ class AggregationService(
             for (match in query.filter.matches) {
                 querySt.bind(match.key, match.value)
             }
-            querySt.bindList("dates", period.dates.map { it.format(DateTimeFormatter.ISO_DATE) })
+
+            val dates: List<String> = (listOf(period.date) + period.offsetsBefore.map { period.date.minusDays(it.toLong()) })
+                    .map { it.format(DateTimeFormatter.ISO_DATE) }
+
+            querySt.bindList("dates", dates)
             LOG.debug("Query = {}", query)
             query.toString()
             querySt.map { rs, _ ->

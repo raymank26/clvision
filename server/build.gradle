@@ -12,7 +12,6 @@ dependencies {
 //    compile project(':sdk')
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile group: 'cc.blynk.clickhouse', name: 'clickhouse4j', version: '1.4.4'
 
     compile group: 'org.jdbi', name: 'jdbi3-core', version: '3.12.2'
     compile group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.12.2'

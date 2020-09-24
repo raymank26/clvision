@@ -20,37 +20,37 @@ class ClickhouseDao(
             val table = tableRegistry.getNameById(tableId) ?: error("No table found for id = $tableId")
 
             val tableName = table.name
-            val availableColumnNames = table.allowedColumns
+            val availableColumnNames = table.allowedColumnNames
             val joinedColumnNames = availableColumnNames.joinToString(", ")
             val joinedColumnPlaceholders = availableColumnNames.joinToString(", ") { ":$it" }
 
             jdbi.useHandle<Exception> { handle ->
                 val preparedBatch = handle.prepareBatch("INSERT INTO $tableName(timeMinute, $joinedColumnNames)" +
                         " VALUES (:timeMinute, $joinedColumnPlaceholders)")
+
                 for (metric in metrics) {
+                    if (hasInvalidColumns(metric, table)) {
+                        continue
+                    }
                     preparedBatch
                             .bind("timeMinute", Instant.ofEpochMilli(metric.timestamp).truncatedTo(ChronoUnit.MINUTES))
                     val nameToValue: Map<String, MetricColumn> = metric.parameters.associateBy { it.name }
-                    for (columnName in availableColumnNames) {
-                        val column: MetricColumn? = nameToValue[columnName]
-                        if (column == null) {
-                            preparedBatch.bind(columnName, "null")
+                    for (tableColumn in table.columns) {
+                        val columnName = tableColumn.name
+                        val metricColumn: MetricColumn? = nameToValue[columnName]
+                        if (metricColumn == null) {
+                            preparedBatch.bindNull(columnName, tableColumn.type)
                         } else {
-                            when (column.value) {
+                            when (metricColumn.value) {
                                 is MetricDouble ->
-                                    preparedBatch.bind(columnName, column.value.value)
+                                    preparedBatch.bind(columnName, metricColumn.value.value)
                                 is MetricString ->
-                                    preparedBatch.bind(columnName, column.value.value)
+                                    preparedBatch.bind(columnName, metricColumn.value.value)
                                 is MetricByte ->
-                                    preparedBatch.bind(columnName, column.value.value)
+                                    preparedBatch.bind(columnName, metricColumn.value.value)
                                 is MetricLong ->
-                                    preparedBatch.bind(columnName, column.value.value)
+                                    preparedBatch.bind(columnName, metricColumn.value.value)
                             }.exhaustive
-                        }
-                    }
-                    for (parameter in metric.parameters) {
-                        if (!table.allowedColumns.contains(parameter.name)) {
-                            throw FieldNotFoundException("No field found name = ${parameter.name}")
                         }
                     }
                     preparedBatch.add()
@@ -62,6 +62,17 @@ class ClickhouseDao(
                 }
             }
         }
+    }
+
+    private fun hasInvalidColumns(metric: Metric, table: TableInfo): Boolean {
+        val metricColumns: Set<String> = metric.parameters.mapTo(mutableSetOf()) { it.name }
+        for (tableColumn in table.columns) {
+            if (!tableColumn.nullable && !metricColumns.contains(tableColumn.name)) {
+                LOG.warn("Nullability violated for column = $tableColumn, tableId = ${table.name}")
+                return true
+            }
+        }
+        return false
     }
 
     fun aggregateMetrics(period: AggregationPeriod, query: Query): List<AggregatedMetric> {

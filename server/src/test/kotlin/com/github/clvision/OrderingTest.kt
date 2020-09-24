@@ -31,15 +31,10 @@ class OrderingTest {
 
     @Test
     fun testProperOrderDays() {
-        val aggMetrics = processMetrics({ offset -> TimeUnit.DAYS.toMillis(offset) }, QUERY_PERIOD.copy(groupByDay = true, dates = generateDays()))
+        val aggMetrics = processMetrics({ offset -> TimeUnit.DAYS.toMillis(offset) }, QUERY_PERIOD.copy(groupByDay = true, offsetsBefore = (1 until 10).toList()))
 
         val times = aggMetrics.map { LocalDate.parse(it.time, DateTimeFormatter.ofPattern("uuuu-MM-dd")) }
         times shouldBeEqualTo times.sorted()
-    }
-
-    private fun generateDays(): List<LocalDate> {
-        val base = LocalDate.ofInstant(Instant.ofEpochMilli(TIMESTAMP), ZoneId.systemDefault())
-        return (0 until 10L).map { base.plusDays(it) }
     }
 
     private fun processMetrics(offsetProvider: (Long) -> Long, aggregationPeriod: AggregationPeriod): List<AggregatedMetric> {
@@ -53,7 +48,7 @@ class OrderingTest {
         ), TIMESTAMP)
         val metrics = (0 until 10L).map { offset ->
             baseMetric.copy(
-                    timestamp = TIMESTAMP + offsetProvider(offset))
+                    timestamp = TIMESTAMP - offsetProvider(offset))
         }.toList()
         clickhouseDao.insertMetrics(metrics)
 
