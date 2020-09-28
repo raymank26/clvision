@@ -1,4 +1,4 @@
-package com.github.clvision
+package com.github.clvision.clickhouse
 
 import org.jdbi.v3.core.Jdbi
 

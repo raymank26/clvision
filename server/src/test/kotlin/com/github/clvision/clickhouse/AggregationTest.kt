@@ -1,5 +1,14 @@
-package com.github.clvision
+package com.github.clvision.clickhouse
 
+import com.github.clvision.Filter
+import com.github.clvision.GroupBy
+import com.github.clvision.Metric
+import com.github.clvision.MetricByte
+import com.github.clvision.MetricColumn
+import com.github.clvision.MetricLong
+import com.github.clvision.MetricString
+import com.github.clvision.MetricType
+import com.github.clvision.Query
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeLessThan
 import org.junit.Assert

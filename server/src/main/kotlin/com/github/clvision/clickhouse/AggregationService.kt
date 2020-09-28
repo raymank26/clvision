@@ -1,5 +1,11 @@
-package com.github.clvision
+package com.github.clvision.clickhouse
 
+import com.github.clvision.AggregatedMetric
+import com.github.clvision.AggregationPeriod
+import com.github.clvision.Filter
+import com.github.clvision.GroupBy
+import com.github.clvision.Query
+import com.github.clvision.TableRegistry
 import org.jdbi.v3.core.Jdbi
 import org.slf4j.LoggerFactory
 import java.time.format.DateTimeFormatter

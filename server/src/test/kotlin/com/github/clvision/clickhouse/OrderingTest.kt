@@ -1,12 +1,20 @@
-package com.github.clvision
+package com.github.clvision.clickhouse
 
+import com.github.clvision.AggregatedMetric
+import com.github.clvision.AggregationPeriod
+import com.github.clvision.Filter
+import com.github.clvision.Metric
+import com.github.clvision.MetricByte
+import com.github.clvision.MetricColumn
+import com.github.clvision.MetricLong
+import com.github.clvision.MetricString
+import com.github.clvision.MetricType
+import com.github.clvision.Query
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Rule
 import org.junit.Test
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
