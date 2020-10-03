@@ -1,5 +1,6 @@
 package com.github.clvision.dashboard
 
+import com.github.clvision.ChartId
 import com.github.clvision.DashboardBriefItem
 import com.github.clvision.DashboardId
 import com.github.clvision.Query
@@ -58,6 +59,12 @@ class InMemoryDashboardService(private val userService: UserService) : Dashboard
         addTarget(dashboardId, newTarget)
 
         return newChartId
+    }
+
+    override fun updateChart(userId: Long, teamId: Long, chartId: ChartId, query: Query) {
+        checkPermission(userId, teamId)
+        val chart = charts[chartId] ?: error("No chart found, id = $chartId")
+        charts[chartId] = chart.copy(query = query)
     }
 
     override fun getDashboardBrief(userId: Long, teamId: Long, id: DashboardId?): DashboardBriefItem? {

@@ -52,6 +52,21 @@ class DashboardsTest {
                 )
     }
 
+    @Test
+    fun updateChartData() {
+        val teamDashboardId = getContainerId(visionFacade.getDashboardBrief(userId, teamId, null))
+        val chartId = visionFacade.createChart(userId, teamId, "Chart", createEmptyFilter(123), teamDashboardId)
+        val newQuery = createEmptyFilter(124)
+        visionFacade.updateChart(userId, teamId, chartId, newQuery)
+
+        val dashboard = visionFacade.getDashboardBrief(userId, teamId, null)
+        dashboard shouldBeEqualTo
+                DashboardBriefItem.Container(
+                        teamDashboardId, TEAM_NAME, listOf(
+                        DashboardBriefItem.Chart(chartId, "Chart", newQuery))
+                )
+    }
+
     private fun createEmptyFilter(tableId: Int): Query {
         return Query(null, Filter(emptyMap()), tableId)
     }

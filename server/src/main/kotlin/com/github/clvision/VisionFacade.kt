@@ -38,8 +38,8 @@ class VisionFacade(
         TODO()
     }
 
-    fun updateChart(chartId: ChartId, query: Query) {
-        TODO()
+    fun updateChart(userId: Long, teamId: Long, chartId: ChartId, query: Query) {
+        return dashboardService.updateChart(userId, teamId, chartId, query)
     }
 }
 
