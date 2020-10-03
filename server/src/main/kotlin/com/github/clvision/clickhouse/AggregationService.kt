@@ -17,7 +17,8 @@ class AggregationService(
         private val tableRegistry: TableRegistry,
 ) {
 
-    fun aggregateMetrics(period: AggregationPeriod, query: Query): List<AggregatedMetric> {
+    fun aggregateMetrics(query: Query): List<AggregatedMetric> {
+        val period = query.aggregationPeriod
         val tableInfo = tableRegistry.getNameById(query.tableId)
                 ?: error("Unable to find tableInfo by id = " + query.tableId)
         val columnNames: Set<String> = query.filter.matches.keys.let { set ->

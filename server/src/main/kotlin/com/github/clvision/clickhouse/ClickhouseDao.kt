@@ -87,8 +87,8 @@ class ClickhouseDao(
         return false
     }
 
-    fun aggregateMetrics(period: AggregationPeriod, query: Query): List<AggregatedMetric> {
-        return aggregationService.aggregateMetrics(period, query)
+    fun aggregateMetrics(query: Query): List<AggregatedMetric> {
+        return aggregationService.aggregateMetrics(query)
     }
 
     fun executeQuery(query: String) {

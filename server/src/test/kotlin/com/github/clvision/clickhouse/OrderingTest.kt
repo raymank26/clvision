@@ -60,7 +60,7 @@ class OrderingTest {
         }.toList()
         clickhouseDao.insertMetrics(metrics)
 
-        val aggMetrics = clickhouseDao.aggregateMetrics(aggregationPeriod, Query(null, Filter(emptyMap()), TABLE_ID))
+        val aggMetrics = clickhouseDao.aggregateMetrics(Query(aggregationPeriod, null, Filter(emptyMap()), TABLE_ID))
         aggMetrics.size shouldBeEqualTo 10
         return aggMetrics
     }

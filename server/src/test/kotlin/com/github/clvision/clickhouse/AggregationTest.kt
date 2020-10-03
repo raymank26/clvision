@@ -49,11 +49,9 @@ class AggregationTest {
 
     @Test
     fun testSingleRowQuery() {
-        val queriedMetrics = clickhouseDao.aggregateMetrics(
-                QUERY_PERIOD,
-                Query(null, Filter(mapOf("colFoo" to "%fi%")),
-                        TABLE_ID
-                )
+        val queriedMetrics = clickhouseDao.aggregateMetrics(Query(QUERY_PERIOD, null, Filter(mapOf("colFoo" to "%fi%")),
+                TABLE_ID
+        )
         )
         queriedMetrics.size shouldBeEqualTo 1
         val aggMetric = queriedMetrics.first()
@@ -64,11 +62,7 @@ class AggregationTest {
 
     @Test
     fun testTwoRowsQuery() {
-        val queriedMetrics = clickhouseDao.aggregateMetrics(
-                QUERY_PERIOD,
-                Query(null, Filter(emptyMap()),
-                        TABLE_ID
-                )
+        val queriedMetrics = clickhouseDao.aggregateMetrics(Query(QUERY_PERIOD, null, Filter(emptyMap()), TABLE_ID)
         )
         queriedMetrics.size shouldBeEqualTo 1
         val aggMetric = queriedMetrics.first()
@@ -79,12 +73,7 @@ class AggregationTest {
 
     @Test
     fun testAggregationByDays() {
-        val queriedMetrics = clickhouseDao.aggregateMetrics(
-                QUERY_PERIOD.copy(groupByDay = true),
-                Query(null, Filter(emptyMap()),
-                        TABLE_ID
-                )
-        )
+        val queriedMetrics = clickhouseDao.aggregateMetrics(Query(QUERY_PERIOD.copy(groupByDay = true), null, Filter(emptyMap()), TABLE_ID))
         queriedMetrics.size shouldBeEqualTo 1
         val aggMetric = queriedMetrics.first()
         aggMetric.name shouldBeEqualTo "value"
@@ -94,8 +83,7 @@ class AggregationTest {
 
     @Test
     fun testAggregationWithGroupBy() {
-        val metrics = clickhouseDao.aggregateMetrics(QUERY_PERIOD,
-                Query(GroupBy("colFoo", "count"), Filter(emptyMap()),
+        val metrics = clickhouseDao.aggregateMetrics(Query(QUERY_PERIOD, GroupBy("colFoo", "count"), Filter(emptyMap()),
                         TABLE_ID
                 ))
         // TODO: write asserts
@@ -103,8 +91,7 @@ class AggregationTest {
 
     @Test
     fun testGroupBySource() {
-        val metrics = clickhouseDao.aggregateMetrics(QUERY_PERIOD,
-                Query(GroupBy("source", "count"), Filter(emptyMap()), TABLE_ID))
+        val metrics = clickhouseDao.aggregateMetrics(Query(QUERY_PERIOD, GroupBy("source", "count"), Filter(emptyMap()), TABLE_ID))
         metrics.size shouldBeEqualTo 2
         metrics[0].name shouldBeEqualTo "srv1"
         metrics[1].name shouldBeEqualTo "srv2"

@@ -1,29 +1,19 @@
 package com.github.clvision
 
-import com.github.clvision.dashboard.InMemoryDashboardService
-import com.github.clvision.user.InMemoryUserService
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import kotlin.properties.Delegates
-
-private const val TEAM_NAME = "foobar"
 
 class DashboardsTest {
 
-    private val visionFacade = run {
-        val userService = InMemoryUserService()
-        VisionFacade(InMemoryDashboardService(userService), userService)
-    }
-    private var userId by Delegates.notNull<Long>()
-    private var teamId by Delegates.notNull<Long>()
+    @JvmField
+    @Rule
+    val visionFacadeRule = VisionFacadeRule()
 
-    @Before
-    fun setUp() {
-        userId = visionFacade.createUser("none@none.ru", "123")
-        teamId = visionFacade.createTeam(userId, TEAM_NAME)
-    }
+    private val userId by lazy { visionFacadeRule.userId }
+    private val teamId by lazy { visionFacadeRule.teamId }
+    private val visionFacade by lazy { visionFacadeRule.visionFacade }
 
     @Test
     fun createDashboard() {
@@ -68,10 +58,10 @@ class DashboardsTest {
     }
 
     private fun createEmptyFilter(tableId: Int): Query {
-        return Query(null, Filter(emptyMap()), tableId)
+        return visionFacadeRule.createEmptyFilter(tableId)
     }
 
     private fun getContainerId(dashboardBriefItem: DashboardBriefItem?): Long {
-        return (dashboardBriefItem as DashboardBriefItem.Container).id
+        return visionFacadeRule.getContainerId(dashboardBriefItem)
     }
 }

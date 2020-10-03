@@ -22,7 +22,7 @@ class TableFieldsTest {
                 MetricColumn("colBar", MetricString("second"))
 
         ), 123L)))
-        ch.clickHouseDao.aggregateMetrics(QUERY_PERIOD, Query(null, Filter(mapOf("random" to "123")), TABLE_ID))
+        ch.clickHouseDao.aggregateMetrics(Query(QUERY_PERIOD, null, Filter(mapOf("random" to "123")), TABLE_ID))
     }
 
     @Test
@@ -35,7 +35,7 @@ class TableFieldsTest {
     }
 
     private fun checkNoEntries() {
-        val res = ch.clickHouseDao.aggregateMetrics(QUERY_PERIOD, Query(null, Filter(emptyMap()), TABLE_ID))
+        val res = ch.clickHouseDao.aggregateMetrics(Query(QUERY_PERIOD, null, Filter(emptyMap()), TABLE_ID))
         res.size shouldBeEqualTo 0
     }
 }

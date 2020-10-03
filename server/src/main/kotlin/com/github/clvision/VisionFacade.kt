@@ -1,11 +1,13 @@
 package com.github.clvision
 
+import com.github.clvision.clickhouse.ClickhouseDao
 import com.github.clvision.dashboard.DashboardService
 import com.github.clvision.user.UserService
 
 class VisionFacade(
         private val dashboardService: DashboardService,
-        private val userService: UserService
+        private val userService: UserService,
+        private val clickhouseDao: ClickhouseDao
 ) {
 
     fun createUser(email: String, password: String): Long {
@@ -19,7 +21,7 @@ class VisionFacade(
     }
 
     fun addMetrics(metrics: List<Metric>) {
-        TODO()
+        clickhouseDao.insertMetrics(metrics)
     }
 
     fun createDashboard(userId: Long, teamId: Long, parentId: DashboardId?, name: String): DashboardId {
@@ -34,8 +36,13 @@ class VisionFacade(
         return dashboardService.getDashboardBrief(userId, teamId, id)
     }
 
-    fun getChartData(chartId: ChartId, query: Query?): List<AggregatedMetric> {
-        TODO()
+    fun getChartData(chartId: ChartId, query: ChartQuery?): List<AggregatedMetric> {
+        val chartBrief = dashboardService.getChartBrief(chartId) ?: error("No chart for id = $chartId")
+        return if (query != null) {
+            clickhouseDao.aggregateMetrics(Query(query.aggregationPeriod, query.groupBy, query.filter, chartBrief.query.tableId))
+        } else {
+            clickhouseDao.aggregateMetrics(chartBrief.query)
+        }
     }
 
     fun updateChart(userId: Long, teamId: Long, chartId: ChartId, query: Query) {
@@ -52,4 +59,4 @@ sealed class DashboardBriefItem {
     data class Chart(val id: ChartId, val name: String, val query: Query): DashboardBriefItem()
 }
 
-data class ChartBriefItem(val id: ChartId, val name: String)
+data class ChartQuery(val groupBy: GroupBy?, val filter: Filter, val aggregationPeriod: AggregationPeriod)

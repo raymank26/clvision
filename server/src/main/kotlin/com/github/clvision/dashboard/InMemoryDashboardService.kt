@@ -75,6 +75,11 @@ class InMemoryDashboardService(private val userService: UserService) : Dashboard
         return buildItemTree(IdType.DASHBOARD, dashboardId)
     }
 
+    override fun getChartBrief(chartId: Long): DashboardBriefItem.Chart? {
+        val chart = charts[chartId] ?: return null
+        return DashboardBriefItem.Chart(chartId, chart.name, chart.query)
+    }
+
     private fun buildItemTree(idType: IdType, id: Long): DashboardBriefItem? {
         return when (idType) {
             IdType.DASHBOARD -> {
