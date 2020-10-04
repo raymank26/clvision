@@ -38,11 +38,13 @@ class VisionFacade(
 
     fun getChartData(chartId: ChartId, query: ChartQuery?): List<AggregatedMetric> {
         val chartBrief = dashboardService.getChartBrief(chartId) ?: error("No chart for id = $chartId")
-        return if (query != null) {
-            clickhouseDao.aggregateMetrics(Query(query.aggregationPeriod, query.groupBy, query.filter, chartBrief.query.tableId))
+
+        val preparedQuery = if (query != null) {
+            Query(query.aggregationPeriod, query.groupBy, query.filter, chartBrief.query.tableId)
         } else {
-            clickhouseDao.aggregateMetrics(chartBrief.query)
+            chartBrief.query
         }
+        return clickhouseDao.aggregateMetrics(preparedQuery)
     }
 
     fun updateChart(userId: Long, teamId: Long, chartId: ChartId, query: Query) {
