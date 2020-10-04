@@ -24,7 +24,7 @@ class DataInsertingTest {
                 teamDashboardId)
         val query = emptyChartQuery()
         val expectedReturn = listOf(AggregatedMetric("foo", "bar", 1.0))
-        visionFacadeRule.setupAggregationAnswer(Query(query.aggregationPeriod, query.groupBy, query.filter, tableId = TABLE_ID),
+        visionFacadeRule.setupClickhouseAggregationAnswer(Query(query.aggregationPeriod, query.groupBy, query.filter, tableId = TABLE_ID),
                 expectedReturn)
 
         visionFacade.addMetrics(listOf(Metric(TABLE_ID, listOf(MetricColumn("foobar", MetricString("baz"))), 2389L)))

@@ -40,7 +40,7 @@ class VisionFacadeRule : ExternalResource() {
         return Query(AggregationPeriod(false, LocalDate.now(), listOf()), null, Filter(emptyMap()), tableId)
     }
 
-    fun setupAggregationAnswer(query: Query, result: List<AggregatedMetric>) {
+    fun setupClickhouseAggregationAnswer(query: Query, result: List<AggregatedMetric>) {
         every { clickhouseDao.aggregateMetrics(eq(query)) } answers { result }
     }
 
