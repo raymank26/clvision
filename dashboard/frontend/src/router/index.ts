@@ -3,21 +3,36 @@ import VueRouter, {RouteConfig} from 'vue-router'
 import LoginComponent from "@/user/LoginComponent.vue";
 import TeamsComponent from '@/user/TeamsComponent.vue';
 import {store} from "@/main";
+import TeamDashboard from "@/dashboard/TeamDashboard.vue";
+import ContainerComponent from "@/user/ContainerComponent.vue";
 
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
     {
         path: "/",
-        name: "teams",
-        component: TeamsComponent,
+        name: "container",
+        redirect: "/teams",
+        component: ContainerComponent,
         beforeEnter: (to, from, next) => {
             if (!store.getters.user) {
                 next({name: "login"})
             } else {
                 next()
             }
-        }
+        },
+        children: [
+            {
+                path: "teams",
+                name: "teams",
+                component: TeamsComponent,
+                children: [{
+                    path: ":id",
+                    name: "teamDashboard",
+                    component: TeamDashboard
+                }]
+            },
+        ]
     },
     {
         path: '/login',

@@ -1,5 +1,11 @@
 <template>
     <div>
+        <div v-for="team in $store.getters.teams">
+            <div>
+                Name: {{team.name}}
+                <router-link to="{name: 'teamDashboard', params: {id: team.id}}"></router-link>
+            </div>
+        </div>
     </div>
 </template>
 

@@ -23,11 +23,11 @@ describe('TeamComponent.vue', () => {
                     return Promise.resolve<any>([
                         {
                             "id": "2892",
-                            "name": "first"
+                            "name": "firstTeam"
                         },
                         {
                             "id": "1829",
-                            "name": "second"
+                            "name": "secondTeam"
                         },
                     ]);
                 } else {
@@ -44,13 +44,19 @@ describe('TeamComponent.vue', () => {
         wrapper = shallowMount(TeamsComponent, {
             store: store,
             localVue: localVue,
-            attachTo: elem
+            attachTo: elem,
+            stubs: {
+                RouterLink: true
+            }
         });
     });
 
     it('TeamComponent lists teams', async done => {
         await Vue.nextTick();
         expect(store.getters.teams.length).toBe(2);
+
+        expect(wrapper.html()).toContain("firstTeam");
+        expect(wrapper.html()).toContain("secondTeam");
 
         done()
     });
