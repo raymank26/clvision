@@ -15,7 +15,7 @@ class InMemoryUserService : UserService {
 
     override fun createTeam(userId: Long, teamName: String): Long {
         val newTeamId = teamId ++
-        teams[newTeamId] = Team(newTeamId, teamName, mutableListOf(userId))
+        teams[newTeamId] = Team(newTeamId, teamName, mutableSetOf(userId))
         return newTeamId
     }
 
@@ -26,8 +26,12 @@ class InMemoryUserService : UserService {
     override fun showAllowed(userId: Long, teamId: Long): Boolean {
         return editAllowed(userId, teamId)
     }
+
+    override fun joinTeam(teamId: Long, userId: Long) {
+        teams[teamId]?.users?.add(userId) ?: error("No team found by id = $teamId")
+    }
 }
 
-data class Team(val id: Long, val name: String, val users: MutableList<Long>)
+data class Team(val id: Long, val name: String, val users: MutableSet<Long>)
 
 data class User(val id: Long, val email: String, val password: String)

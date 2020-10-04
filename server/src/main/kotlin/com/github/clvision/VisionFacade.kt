@@ -50,6 +50,10 @@ class VisionFacade(
     fun updateChart(userId: Long, teamId: Long, chartId: ChartId, query: Query) {
         return dashboardService.updateChart(userId, teamId, chartId, query)
     }
+
+    fun joinTeam(teamId: Long, userId: Long) {
+        return userService.joinTeam(teamId, userId)
+    }
 }
 
 typealias DashboardId = Long
