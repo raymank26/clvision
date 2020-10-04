@@ -54,6 +54,10 @@ class VisionFacade(
     fun joinTeam(teamId: Long, userId: Long) {
         return userService.joinTeam(teamId, userId)
     }
+
+    fun listTeams(userId: Long): List<Team> {
+        return userService.listTeams(userId)
+    }
 }
 
 typealias DashboardId = Long
@@ -64,5 +68,7 @@ sealed class DashboardBriefItem {
     data class Container(val id: DashboardId, val name: String, val children: List<DashboardBriefItem>): DashboardBriefItem()
     data class Chart(val id: ChartId, val name: String, val query: Query): DashboardBriefItem()
 }
+
+data class Team(val id: Long, val name: String)
 
 data class ChartQuery(val groupBy: GroupBy?, val filter: Filter, val aggregationPeriod: AggregationPeriod)

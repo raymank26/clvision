@@ -1,6 +1,8 @@
 package com.github.clvision
 
+import com.github.clvision.common.TEAM_NAME
 import com.github.clvision.common.VisionFacadeRule
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeGreaterThan
 import org.junit.Rule
 import org.junit.Test
@@ -22,5 +24,17 @@ class PermissionsTest {
         visionFacade.joinTeam(teamId, secondUserId)
         val secondDashboardId = visionFacade.createDashboard(secondUserId, teamId, dashboardId, "second dashboard")
         secondDashboardId shouldBeGreaterThan 0
+    }
+
+    @Test
+    fun testTeamCollection() {
+        val secondUserId = visionFacade.createUser("second@gmail.com", "123")
+        val anotherTeamName = "Another name"
+        val anotherTeamId = visionFacade.createTeam(secondUserId, anotherTeamName)
+        visionFacade.joinTeam(teamId, secondUserId)
+        visionFacade.listTeams(secondUserId).toSet() shouldBeEqualTo setOf(
+                Team(teamId, TEAM_NAME),
+                Team(anotherTeamId, anotherTeamName)
+        )
     }
 }
