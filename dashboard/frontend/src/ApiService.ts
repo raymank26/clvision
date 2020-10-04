@@ -2,10 +2,10 @@ import Axios from "axios";
 
 export class ApiService {
 
-    get(methodName: String, queryParams: object) {
-        return Axios.get("/api/" + methodName, {
+    get<T = any>(methodName: String, queryParams?: object): Promise<T> {
+        return Axios.get<T>("/api/" + methodName, {
             params: queryParams
-        });
+        }).then(response => response.data as T);
     }
 
     post<T = any>(methodName: String, config: PostConfig): Promise<T> {

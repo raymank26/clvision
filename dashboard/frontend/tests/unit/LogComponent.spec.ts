@@ -22,7 +22,8 @@ describe('LoginComponent.vue', () => {
             get: jest.fn(), post: jest.fn((url, config) => {
                 if ((config.bodyParams as any)["username"] === USER_NAME) {
                     return Promise.resolve<any>({
-                        username: USER_NAME
+                        username: USER_NAME,
+                        id: "123"
                     });
                 } else {
                     return Promise.reject<any>({

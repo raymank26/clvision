@@ -1,18 +1,38 @@
 <template>
-    <div>
-        <form v-on:submit.prevent="submit">
-            <input id="username" name="username" v-model="username">
-            <input id="password" name="password" v-model="password">
-            <button id="submit" type="submit">Submit</button>
-        </form>
-        <div v-if="errorType === 'no input'">
-            Username or password is not set.
-        </div>
-        <div v-else-if="errorType === 'mismatch'">
-            Illegal username or password.
-        </div>
-        <div v-else-if="errorType === 'unknown'">
-            Unknown error
+    <div class="row justify-content-center mt-4">
+        <div class="col-4">
+            <div class="row justify-content-center col-auto">
+                <h3>Login</h3>
+            </div>
+            <form v-on:submit.prevent="submit">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input id="username" class="form-control" name="username" v-model="username">
+                </div>
+                <div class="form-group">
+                    <label for="username">Password</label>
+                    <input id="password" class="form-control" name="password" v-model="password">
+                </div>
+                <button class="btn btn-primary" id="submit" type="submit">Submit</button>
+            </form>
+            <div class="mt-2">
+                <div v-if="errorType === 'no input'">
+                    <div class="alert alert-danger" role="alert">
+                        Username or password is not set.
+                    </div>
+                </div>
+                <div v-else-if="errorType === 'mismatch'">
+                    <div class="alert alert-danger" role="alert">
+                        Illegal username or password.
+                    </div>
+                </div>
+                <div v-else-if="errorType === 'unknown'">
+                    <div class="alert alert-danger" role="alert">
+                        Unknown error
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </template>

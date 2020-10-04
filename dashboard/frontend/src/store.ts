@@ -1,20 +1,37 @@
 import Vuex, {ActionContext, Module} from 'vuex'
-import {User, UserService} from "@/user/UserService";
+import {Team, User, UserService} from "@/user/UserService";
 
 export function createStore(userService: UserService) {
     let userModule: Module<UserState, RootState> = {
         state: {
-            user: null
+            user: null,
+            teams: []
         },
         getters: {
             user: state => {
                 return state.user
+            },
+            teams: state => {
+                return state.teams;
+            }
+        },
+        mutations: {
+            setUser: (context, user) => {
+                context.user = user;
+            },
+            setTeams: (context, teams) => {
+                context.teams = teams;
             }
         },
         actions: {
-            "login": function (context: ActionContext<UserState, RootState>, payload: any): any {
+            "login": function (context, payload: any): any {
                 return userService.login(payload.username, payload.password).then(user => {
-                    context.state.user = user;
+                    context.commit("setUser", user);
+                })
+            },
+            "loadTeams": (context, payload) => {
+                return userService.listTeams().then(teams => {
+                    context.commit("setTeams", teams);
                 })
             }
         }
@@ -32,5 +49,6 @@ interface RootState {
 
 interface UserState {
     user: User | null
+    teams: Team[]
 }
 

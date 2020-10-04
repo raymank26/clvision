@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Vuex from 'vuex'
 import {createStore} from "@/store";
-import {UserService} from "@/user/UserService";
+import {User, UserService} from "@/user/UserService";
 import {ApiService} from "@/ApiService";
 
 Vue.use(BootstrapVue);
@@ -15,9 +15,14 @@ Vue.use(IconsPlugin);
 Vue.use(Vuex);
 
 let apiService = new ApiService();
-let store = createStore(new UserService(apiService));
+export let store = createStore(new UserService(apiService));
 
 Vue.config.productionTip = false;
+
+store.commit("setUser", {
+  username: "anton.ermak",
+  id: "123"
+} as User);
 
 new Vue({
   router,

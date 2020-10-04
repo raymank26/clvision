@@ -15,8 +15,18 @@ export class UserService {
             }
         });
     }
+
+    listTeams(): Promise<Team[]> {
+        return this.apiService.get<Team[]>("listTeams");
+    }
 }
 
 export interface User {
+    id: string
     username: string
+}
+
+export interface Team {
+    id: string,
+    name: string
 }
