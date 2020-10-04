@@ -1,5 +1,7 @@
 package com.github.clvision
 
+import com.github.clvision.common.TEAM_NAME
+import com.github.clvision.common.VisionFacadeRule
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
 import org.junit.Rule

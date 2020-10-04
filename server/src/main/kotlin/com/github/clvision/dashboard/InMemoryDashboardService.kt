@@ -44,7 +44,7 @@ class InMemoryDashboardService(private val userService: UserService) : Dashboard
     }
 
     private fun checkPermission(userId: Long, teamId: Long) {
-        if (!userService.editAllowed(userId, teamId)) {
+        if (!userService.isEditAllowed(userId, teamId)) {
             throw PermissionDenied("Unable to create dashboard by userId = $userId in teamId = $teamId")
         }
     }
@@ -68,7 +68,7 @@ class InMemoryDashboardService(private val userService: UserService) : Dashboard
     }
 
     override fun getDashboardBrief(userId: Long, teamId: Long, id: DashboardId?): DashboardBriefItem? {
-        if (!userService.showAllowed(userId, teamId)) {
+        if (!userService.isShowAllowed(userId, teamId)) {
             throw PermissionDenied("Unable to show dashboard for userId = $userId in teamId = $teamId")
         }
         val dashboardId = id ?: (teamToDashboardId[teamId] ?: error("No dashboard created for teamId = $teamId"))

@@ -19,12 +19,12 @@ class InMemoryUserService : UserService {
         return newTeamId
     }
 
-    override fun editAllowed(userId: Long, teamId: Long): Boolean {
+    override fun isEditAllowed(userId: Long, teamId: Long): Boolean {
         return teams[teamId]?.users?.contains(userId) ?: false
     }
 
-    override fun showAllowed(userId: Long, teamId: Long): Boolean {
-        return editAllowed(userId, teamId)
+    override fun isShowAllowed(userId: Long, teamId: Long): Boolean {
+        return isEditAllowed(userId, teamId)
     }
 
     override fun joinTeam(teamId: Long, userId: Long) {

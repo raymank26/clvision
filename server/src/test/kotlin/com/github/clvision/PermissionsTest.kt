@@ -1,5 +1,6 @@
 package com.github.clvision
 
+import com.github.clvision.common.VisionFacadeRule
 import org.amshove.kluent.shouldBeGreaterThan
 import org.junit.Rule
 import org.junit.Test

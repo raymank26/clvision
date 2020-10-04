@@ -1,9 +1,14 @@
-package com.github.clvision
+package com.github.clvision.common
 
+import com.github.clvision.AggregatedMetric
+import com.github.clvision.AggregationPeriod
+import com.github.clvision.DashboardBriefItem
+import com.github.clvision.Filter
+import com.github.clvision.Query
+import com.github.clvision.VisionFacade
 import com.github.clvision.clickhouse.ClickhouseDao
 import com.github.clvision.dashboard.InMemoryDashboardService
 import com.github.clvision.user.InMemoryUserService
-import io.mockk.MockK
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
