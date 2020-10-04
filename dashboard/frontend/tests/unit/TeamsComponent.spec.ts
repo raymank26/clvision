@@ -10,8 +10,6 @@ import TeamsComponent from "@/user/TeamsComponent.vue";
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-const USER_NAME = "anton.ermak";
-
 describe('TeamComponent.vue', () => {
     let store: Store<any>;
     let apiService: ApiService;
