@@ -1,10 +1,10 @@
 package com.github.clvision.clickhouse
 
 import com.github.clvision.AggregatedMetric
-import com.github.clvision.AggregationPeriod
-import com.github.clvision.Filter
-import com.github.clvision.GroupBy
-import com.github.clvision.Query
+import com.github.clvision.sdk.AggregationPeriod
+import com.github.clvision.sdk.Filter
+import com.github.clvision.sdk.GroupBy
+import com.github.clvision.sdk.Query
 import com.github.clvision.TableRegistry
 import org.jdbi.v3.core.Jdbi
 import org.slf4j.LoggerFactory
@@ -23,7 +23,7 @@ class AggregationService(
                 ?: error("Unable to find tableInfo by id = " + query.tableId)
         val columnNames: Set<String> = query.filter.matches.keys.let { set ->
             if (query.groupBy != null) {
-                set + query.groupBy.field
+                set + query.groupBy!!.field
             } else {
                 set
             }
@@ -57,7 +57,7 @@ class AggregationService(
             querySt.map { rs, _ ->
                 val time = rs.getString("time")
                 val value = rs.getDouble("value")
-                val name = if (query.groupBy != null) rs.getString(query.groupBy.field) else "value"
+                val name = if (query.groupBy != null) rs.getString(query.groupBy!!.field) else "value"
                 AggregatedMetric(name, time, value)
             }.list()
         }
@@ -80,7 +80,7 @@ class AggregationService(
             "timeMinute"
         }
         return if (query.groupBy != null) {
-            time + ", " + query.groupBy.field
+            time + ", " + query.groupBy!!.field
         } else {
             time
         }
@@ -93,7 +93,7 @@ class AggregationService(
             "timeMinute as time"
         }
         return if (query.groupBy != null) {
-            time + "," + query.groupBy.field
+            time + "," + query.groupBy!!.field
         } else {
             time
         }

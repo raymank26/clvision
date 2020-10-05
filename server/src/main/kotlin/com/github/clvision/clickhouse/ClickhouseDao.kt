@@ -1,14 +1,13 @@
 package com.github.clvision.clickhouse
 
 import com.github.clvision.AggregatedMetric
-import com.github.clvision.AggregationPeriod
 import com.github.clvision.Metric
 import com.github.clvision.MetricByte
 import com.github.clvision.MetricColumn
 import com.github.clvision.MetricDouble
 import com.github.clvision.MetricLong
 import com.github.clvision.MetricString
-import com.github.clvision.Query
+import com.github.clvision.sdk.Query
 import com.github.clvision.TableInfo
 import com.github.clvision.TableRegistry
 import com.github.clvision.exhaustive

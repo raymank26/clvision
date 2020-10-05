@@ -1,6 +1,6 @@
-package com.github.clvision.user
+package com.github.clvision.dashboard.user
 
-import com.github.clvision.Team
+import com.github.clvision.dashboard.Team
 
 interface UserService {
     fun createUser(email: String, password: String): Long

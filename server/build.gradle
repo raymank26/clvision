@@ -9,9 +9,7 @@ apply plugin: "application"
 mainClassName = "com.clvision.server.Main"
 
 dependencies {
-//    compile project(':sdk')
-
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile project(':sdk')
 
     compile group: 'org.jdbi', name: 'jdbi3-core', version: '3.12.2'
     compile group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.12.2'

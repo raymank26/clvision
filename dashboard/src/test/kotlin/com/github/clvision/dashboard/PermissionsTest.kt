@@ -1,7 +1,5 @@
-package com.github.clvision
+package com.github.clvision.dashboard
 
-import com.github.clvision.common.TEAM_NAME
-import com.github.clvision.common.VisionFacadeRule
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeGreaterThan
 import org.junit.Rule
@@ -11,7 +9,7 @@ class PermissionsTest {
 
     @JvmField
     @Rule
-    val visionFacadeRule = VisionFacadeRule()
+    val visionFacadeRule = VisionDashboardRule()
 
     private val userId by lazy { visionFacadeRule.userId }
     private val teamId by lazy { visionFacadeRule.teamId }

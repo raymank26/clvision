@@ -1,11 +1,13 @@
-package com.github.clvision.user
+package com.github.clvision.dashboard.user
+
+import com.github.clvision.dashboard.Team
 
 class InMemoryUserService : UserService {
     private var userId = 0L
     private val users = mutableMapOf<Long, User>()
 
     private var teamId = 0L
-    private val teams = mutableMapOf<Long, Team>()
+    private val teams = mutableMapOf<Long, TeamED>()
 
     private val userIdToTeamId = mutableMapOf<Long, MutableList<Long>>()
 
@@ -17,7 +19,7 @@ class InMemoryUserService : UserService {
 
     override fun createTeam(userId: Long, teamName: String): Long {
         val newTeamId = teamId ++
-        teams[newTeamId] = Team(newTeamId, teamName, mutableSetOf(userId))
+        teams[newTeamId] = TeamED(newTeamId, teamName, mutableSetOf(userId))
         updateUserTeams(userId, newTeamId)
         return newTeamId
     }
@@ -46,15 +48,15 @@ class InMemoryUserService : UserService {
         updateUserTeams(userId, teamId)
     }
 
-    override fun listTeams(userId: Long): List<com.github.clvision.Team> {
+    override fun listTeams(userId: Long): List<Team> {
         val teamIds = userIdToTeamId[userId] ?: emptyList()
         return teamIds.asSequence()
                 .mapNotNull { teams[it] }
-                .map { com.github.clvision.Team(it.id, it.name) }
+                .map { Team(it.id, it.name) }
                 .toList()
     }
 }
 
-private data class Team(val id: Long, val name: String, val users: MutableSet<Long>)
+private data class TeamED(val id: Long, val name: String, val users: MutableSet<Long>)
 
 private data class User(val id: Long, val email: String, val password: String)

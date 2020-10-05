@@ -1,10 +1,7 @@
 package com.github.clvision.dashboard
 
-import com.github.clvision.ChartId
-import com.github.clvision.DashboardBriefItem
-import com.github.clvision.DashboardId
-import com.github.clvision.Query
-import com.github.clvision.user.UserService
+import com.github.clvision.sdk.Query
+import com.github.clvision.dashboard.user.UserService
 
 class InMemoryDashboardService(private val userService: UserService) : DashboardService {
 

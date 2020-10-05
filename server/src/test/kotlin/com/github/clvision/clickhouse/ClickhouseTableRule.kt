@@ -1,6 +1,6 @@
 package com.github.clvision.clickhouse
 
-import com.github.clvision.AggregationPeriod
+import com.github.clvision.sdk.AggregationPeriod
 import com.github.clvision.Column
 import com.github.clvision.TableInfo
 import org.jdbi.v3.core.Jdbi
